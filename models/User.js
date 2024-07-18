@@ -42,6 +42,10 @@ const userSchema = new mongoose.Schema({
     resetPasswordExpire:{
         type:Date,
     },
+    userHistory:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"UserHistory"
+    }
 
 });
 

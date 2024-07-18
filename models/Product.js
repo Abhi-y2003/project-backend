@@ -13,9 +13,9 @@ const productSchema = new mongoose.Schema({
         type:String,
         trim:true,
     },
-    tag:{
+    category:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"tags"
+        ref:"Category"
     },
     price:{
         type:Number
