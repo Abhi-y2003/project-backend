@@ -83,3 +83,31 @@ exports.showAllProducts = async (req, res) => {
     });
   }
 };
+
+
+
+exports.getProductDetails = async(req,res)=>{
+   try {
+    
+    const {productId} = req.body
+    const productDetails = Product.find({productId}).populate("category").exec()
+
+    if(!productDetails){
+      return res.status(400).json({
+        success:false,
+        message:"Error in getting/populating product details"
+      })
+    }
+
+    return res.json({
+      success:true,
+      message:"Date found for specific Product ID"
+    })
+   } catch (error) {
+    return res.status(400).json({
+      success:false,
+      message:"Error in getting All product details"
+    })
+   }
+}
+

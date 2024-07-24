@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim:true,
     },
-    lastNme:{
+    lastName:{
         type:String,
         required:true,
         trim:true,
@@ -22,29 +22,38 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim:true,
     },
+    email:{
+        type:String,
+        required:true,
+        trim:true,
+    },
     address:{
         type:String,
-        required:true
+        // required:true
     },
     accountType:{
         type:String,
         enum:["Admin", "User", "Delivery"],
         required:true,
     },
-    additionDetails:{
+    additionalDetails:{
         type:mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref:Profile
+        //required:true,
+        ref:"Profile"
     },
     token:{
         type:String,
     },
-    resetPasswordExpire:{
+    resetPasswordExpires:{
         type:Date,
     },
     userHistory:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"UserHistory"
+    },
+    image:{
+        type:String,
+        require:true
     }
 
 });

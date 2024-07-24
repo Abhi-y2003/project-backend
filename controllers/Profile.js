@@ -1,42 +1,118 @@
 const Profile = require("../models/Profile");
 const User = require("../models/User");
 
+
 exports.updateProfile = async (req, res) => {
   try {
-    const { email = "", anotherAddress, gender } = req.body;
+    const {
+      firstName,
+      lastName,
+      about = "",
+      anotherAddress = "",
+      gender = "",
+    } = req.body
+    const id = req.user.id
 
-    const id = req.user.id;
+    // Find the profile by id
+    const userDetails = await User.findById(id)
+    const profile = await Profile.findById(userDetails.additionalDetails)
 
-    if (!contactNumber || !id) {
-      return res.status(403).json({
-        success: false,
-        message: "Please fill mandatory fields",
-      });
-    }
+    const user = await User.findByIdAndUpdate(id, {
+      firstName,
+      lastName,
+    })
+    await user.save()
 
-    const userDetails = await User.findById(id);
-    const profileId = userDetails.additionDetails;
+    // Update the profile fields
+    profile.about = about
+    profile.anotherAddress = anotherAddress
+    profile.gender = gender
 
-    const profileDetails = await User.findById(profileId);
+    // Save the updated profile
+    await profile.save()
 
-    profileDetails.email = email;
-    profileDetails.anotherAddress = anotherAddress;
-    profileDetails.gender = gender;
+    // Find the updated user details
+    const updatedUserDetails = await User.findById(id)
+      .populate("additionalDetails")
+      .exec()
 
-    await profileDetails.save();
-
-    return res.status(200).json({
+    return res.json({
       success: true,
-      message: " Additional Profile updated",
-      profileDetails,
-    });
+      message: "Profile updated successfully",
+      updatedUserDetails,
+    })
   } catch (error) {
-    return res.status(403).json({
+    console.log(error)
+    return res.status(500).json({
       success: false,
-      message: "Error in profile section",
-    });
+      error: error.message,
+    })
   }
-};
+}
+
+// exports.updateProfile = async (req, res) => {
+//   try {
+//     const {  about, gender , anotherAddress="" } = req.body;
+
+//     console.log("Hello")
+
+//     const id = req.user.id;
+//     console.log(id)
+
+//     console.log("Hello2")
+
+//     if (!gender || !id) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Please fill mandatory fields",
+//       });
+//     }
+    
+//     console.log("Hello3")
+
+//     const userDetails = await User.findById(id);
+//     console.log(userDetails.email)
+
+//     const profileId = await Profile.findById(userDetails.additionalDetails);
+
+//     console.log(profileId)
+
+    
+      
+//       const profileDetails = await User.findById(profileId);
+
+//       console.log(profileDetails)
+//       if (!profileDetails) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "Profile not found",
+//         });
+//       }
+
+//       profileDetails.about = about;
+//       profileDetails.anotherAddress = anotherAddress;
+//       profileDetails.gender = gender;
+  
+//       await profileDetails.save();
+
+//       res.status(200).json({
+//         success:true,
+//         msg:"profile details updated"
+
+//       })
+
+//     return res.status(200).json({
+//       success: true,
+//       message: " Additional Profile updated",
+//       profileDetails,
+//     });
+//   } catch (error) {
+//     return res.status(403).json({
+//       success: false,
+//       message: "Error in profile section",
+//     });
+//   }
+// };
 
 //delete account
 
@@ -52,7 +128,7 @@ exports.deleteAccount = async (req, res) => {
       });
     }
 
-    await Profile.findByIdAndDelete({ _id: userDetails.additionDetails });
+    await Profile.findByIdAndDelete({ _id: userDetails.additionalDetails });
 
     await User.findByIdAndDelete({ _id: id });
 
@@ -71,5 +147,24 @@ exports.deleteAccount = async (req, res) => {
 
 
 exports.getAllUserDetails = async(req,res)=>{
-    
+    try{
+
+      const id = req.user.id;
+
+      const userDetails = await User.findById(id).populate("additionalDetails").exec();
+
+      console.log(userDetails);
+
+      return res.status(200).json({
+        success:true,
+        message:"User details found",
+        userDetails
+      })
+
+    }catch(error){
+      return res.status(200).json({
+        success:false,
+        message:"User details cant be populated"
+      })
+    }
 }

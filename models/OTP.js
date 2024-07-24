@@ -3,15 +3,19 @@ const mongoose = require("mongoose")
 const OTPSchema = new mongoose.Schema({
     mobileNumber:{
         type:Number,
-        required:true,
+    },
+    email:{
+
+        type:String,
+        required: true
     },
     otp:{
-        type:string,
-        required:true,
+        type:String,
+        required:true
     },
     createdAt:{
         type:Date,
-        default:Date.now(),
+        default:Date.now,
         expires:5*60,
     }
 })

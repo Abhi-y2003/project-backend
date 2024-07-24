@@ -7,9 +7,9 @@ const bcrypt = require("bcryptjs/dist/bcrypt");
 
 exports.resetPasswordToken = async (req, res) => {
   try {
-    const email = req.body;
+    const email = req.body.email;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email });
 
     if (!userExists) {
       return res.status(403).json({
@@ -19,24 +19,29 @@ exports.resetPasswordToken = async (req, res) => {
     }
 
     const token = crypto.randomUUID();
-    console.log(token);
 
-    const updateUserDetails = User.findOneAndUpdate(
+    console.log("Token is ", token);
+
+    const updateUserDetails = await User.findOneAndUpdate(
       { email: email },
       {
         token: token,
-        resetPasswordExpire: Date.now() + 5 * 60 * 100,
+        resetPasswordExpires: Date.now() + 5 * 60 * 1000,
       },
       { new: true }
     );
 
+    console.log("Update user details" , updateUserDetails)
+
     const url = `http://localhost:3000/update-password/${token}`;
+
 
     await mailSender(email, "Reset Password Link", url);
 
     return res.status(200).json({
       success: true,
       msg: "Email sent Successfully",
+      token
     });
   } catch (error) {
     return res.status(400).json({
@@ -68,7 +73,7 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    if (userDetails.resetPasswordExpire < Date.now()) {
+    if (userDetails.resetPasswordExpires < Date.now()) {
       return res.status(403).json({
         success: false,
         message: "Session time out",
@@ -77,7 +82,8 @@ exports.resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.findByIdAndUpdate(
+
+    await User.findOneAndUpdate(
       { token: token },
       {
         password: hashedPassword,
