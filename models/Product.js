@@ -3,14 +3,12 @@ const mongoose =require("mongoose")
 const productSchema = new mongoose.Schema({
     productName:{
         type:String,
+        require:true,
         trim:true,
     },
-    // productId:{
-    //     type:String,
-    //     trim:true,
-    // },
-    description:{
+    productDescription:{
         type:String,
+        require:true,
         trim:true,
     },
     category:{
@@ -18,7 +16,8 @@ const productSchema = new mongoose.Schema({
         ref:"Category"
     },
     price:{
-        type:Number
+        type:String,
+        require:true
     }
 })
 

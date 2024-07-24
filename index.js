@@ -3,12 +3,33 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const {cloudinaryConnect} = require("./config/cloudinaryConnect")
 const database = require("./config/database");
+const multer = require("multer")
+
+
+//Multer configuration 
+
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Temporary storage location
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+
 // const fileUpload = require("express-fileUpload")
 const userRoutes = require("./routes/user")
 const profileRoutes = require("./routes/profile")
 const productRoutes = require("./routes/product")
 const contactRoutes = require("./routes/contact")
-const paymentRoutes = require("./routes/payment")
+const paymentRoutes = require("./routes/payment");
+const { uploadImageTOCloudinary } = require("./utils/imageUploader");
 const PORT = process.env.PORT || 4000;
 
 require("dotenv").config();
@@ -16,6 +37,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(express.urlencoded({ extended: true }));
 
 database.connect()
 
@@ -23,7 +45,7 @@ database.connect()
 //routes
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/profile", profileRoutes);
-app.use("/api/v1/course", productRoutes);
+app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/contact", contactRoutes);
 

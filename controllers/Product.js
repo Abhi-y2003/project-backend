@@ -1,48 +1,63 @@
 const Product = require("../models/Product");
 const Tag = require("../models/tags");
 const User = require("../models/User");
+const Category = require("../models/category")
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
 require("dotenv").config;
 
 //CreateProduct
 exports.createProduct = async (req, res) => {
   try {
-    const { productName, productDescription, tag, price } = req.body;
 
-    const thumbnail = req.files.thumbnailImage;
+    console.log("Hello")
+
+    const { productName, productDescription, category , price } = req.body;
+
+    console.log("two")
+    
+    //const thumbnail = req.files.thumbnailImage;
+
+    console.log("two three")
+
+    // if(thumbnail){
+    //   console.log("image got")
+    // }
 
     //validation
-    if (!productName || !productDescription || !tag || !price || !thumbnail) {
+    if (!productName || !productDescription || !category || !price ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
 
-    const tagDetails = await Tag.findOne({ tag });
+    const categoryDetails = await Category.findOne({_id:category });
 
-    if (!tagDetails) {
+    if (!categoryDetails) {
       return res.status(400).json({
         success: false,
-        message: "Invalid Tag please create a new tag",
+        message: "Invalid Category please create a new category",
       });
     }
 
-    const thumbnailImage = await uploadImageToCloudinary(
-      thumbnail,
-      process.env.FOLDER_NAME
-    );
+    // const thumbnailImage = await uploadImageToCloudinary(
+    //   thumbnail,
+    //   process.env.FOLDER_NAME
+    // );
+
+    console.log("four")
 
     const newProduct = await Product.create({
       productName: productName,
-      description: productDescription,
-      tag: tag,
+      productDescription: productDescription,
+      category: category,
       price: price,
-      thumbnail: thumbnailImage.secure_url,
     });
 
-    await Tag.findOneAndUpdate(
-      { tag: tag },
+    console.log("five")
+
+    await Category.findOneAndUpdate(
+      {_id:category },
       {
         $push: {
           product: newProduct._id,
@@ -54,6 +69,7 @@ exports.createProduct = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "New product created",
+      newProduct,
     });
   } catch (error) {
     return res.status(400).json({
