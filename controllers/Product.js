@@ -13,9 +13,11 @@ exports.createProduct = async (req, res) => {
 
     const { productName, productDescription, category , price } = req.body;
 
-    console.log("two")
+    console.log("Product Name is" , productName)
     
-    //const thumbnail = req.files.thumbnailImage;
+    const thumbnail = req.files.thumbnailImage;
+
+    console.log("thumbnail is" , thumbnail)
 
     console.log("two three")
 

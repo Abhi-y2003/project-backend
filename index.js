@@ -3,23 +3,31 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const {cloudinaryConnect} = require("./config/cloudinaryConnect")
 const database = require("./config/database");
-const multer = require("multer")
+const app = express()
 
+//multer
 
-//Multer configuration 
-
-
+var multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Temporary storage location
+      cb(null, '/tmp/my-uploads')
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, file.fieldname + '-' + uniqueSuffix)
     }
-});
+  })
+  
+  const upload = multer({ storage: storage })
 
-const upload = multer({ storage: storage });
+
+// for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true })); 
+
+// for parsing multipart/form-data
+app.use(upload.array()); 
+app.use(express.static('public'));
 
 
 
@@ -33,7 +41,7 @@ const { uploadImageTOCloudinary } = require("./utils/imageUploader");
 const PORT = process.env.PORT || 4000;
 
 require("dotenv").config();
-const app = express()
+
 
 app.use(express.json())
 app.use(cookieParser())
@@ -57,6 +65,7 @@ app.get("/", (req,res)=>{
         message:"Your server is up and running...."
     });
 });
+
 
 app.listen(PORT, ()=>{
     console.log(`App is running on ${PORT}`);

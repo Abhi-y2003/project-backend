@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 
+
 const{createProduct, showAllProducts , getProductDetails} = require("../controllers/Product")
 
 const{createCategory, showAllCategory} = require("../controllers/Categories");
